@@ -5,4 +5,4 @@ Data Preprocessing, EDA, Streamlit.
 <br>
 Domain Manufacturing
 <br>
-AUTHOR - BIRENDRA EMANUEL EKKA
+AUTHOR - BIRENDRA EMANUEL (EKKA)
