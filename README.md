@@ -1,6 +1,8 @@
 # Industrial-Copper-Modeling
 Skills take away From This Project Python scripting, 
-Data Preprocessing, EDA, Streamlit. 
+<br>
+Data Preprocessing, EDA, Streamlit.
+<br>
 Domain Manufacturing
 <br>
 AUTHOR - BIRENDRA EMANUEL EKKA
