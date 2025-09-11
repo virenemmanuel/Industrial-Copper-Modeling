@@ -2,21 +2,10 @@ from datetime import date
 import numpy as np
 import pickle
 import streamlit as st
+import base64
+import os
 
 # ----------------- Streamlit page configuration -----------------
-def streamlit_config():
-    st.set_page_config(page_title='INDUSTRIAL COPPER MODELING')
-
-    # Page header transparent color
-    page_background_color = """
-    <style>
-    [data-testid="stHeader"] { background: rgb(0,0,0,0); }
-    </style>
-    """
-    st.markdown(page_background_color, unsafe_allow_html=True)
-
-    # Page title centered
-    st.markdown(f'<h1 style="text-align: center;">INDUSTRIAL COPPER MODELING</h1>', unsafe_allow_html=True)
 
 
 # ----------------- Custom styles -----------------
@@ -81,7 +70,15 @@ class Prediction:
 
             with col2:
                 delivery_date = st.date_input("Delivery Date", min_value=date(2020,8,1), max_value=date(2022,2,28), value=date(2020,8,1))
-                customer = st.text_input("Customer ID (Min: 12458000 & Max: 2147484000)")
+                customer_input = st.text_input("Customer ID (Min: 12458000 & Max: 2147484000)")
+                if customer_input.strip() == "":
+                    customer = 0
+                else:
+                    try:
+                        customer = float(customer_input)
+                    except ValueError:
+                        st.error("❌ Please enter a valid numeric Customer ID")
+                        st.stop()
                 status = st.selectbox("Status", options=status_values)
                 application = st.number_input("Application", min_value=0.0, max_value=100.0, value=10.0)
                 width = st.number_input("Width", min_value=1.0, max_value=2990000.0, value=1.0)
@@ -90,20 +87,24 @@ class Prediction:
             style_submit_button()
 
             if submitted:
-                with open(r'C:\\Users\\viren\\OneDrive\\Desktop\\IIT-MADARAS(GUVI)\\data\\INDUSTRIAL COPPER MODELING\\pickle\\regression_model.pkl', 'rb') as f:
-                    model = pickle.load(f)
+                if quantity_log == "":
+                    st.warning("⚠️ Please enter a value for Quantity Tons")
+                else:
 
-                user_data = np.array([[customer, float(country), status_dict[status], item_type_dict[item_type],
-                                       application, width, product_ref, np.log(float(quantity_log)),
-                                       np.log(float(thickness_log)), item_date.day, item_date.month, item_date.year,
-                                       delivery_date.day, delivery_date.month, delivery_date.year]])
+                    with open(r'C:\\Users\\viren\\OneDrive\\Desktop\\IIT-MADARAS(GUVI)\\data\\INDUSTRIAL COPPER MODELING\\pickle\\regression_model.pkl', 'rb') as f:
+                        model = pickle.load(f)
 
-                y_pred = model.predict(user_data)
-                selling_price = round(np.exp(y_pred[0]), 2)
+                    user_data = np.array([[customer, float(country), status_dict[status], item_type_dict[item_type],
+                                        application, width, product_ref, np.log(float(quantity_log)),
+                                        np.log(float(thickness_log)), item_date.day, item_date.month, item_date.year,
+                                        delivery_date.day, delivery_date.month, delivery_date.year]])
 
-                style_prediction()
-                st.markdown(f'<h3 class="center-text">Predicted Selling Price = {selling_price}</h3>', unsafe_allow_html=True)
-                st.balloons()
+                    y_pred = model.predict(user_data)
+                    selling_price = round(np.exp(y_pred[0]), 2)
+
+                    style_prediction()
+                    st.markdown(f'<h3 class="center-text">Predicted Selling Price = {selling_price}</h3>', unsafe_allow_html=True)
+                    st.balloons()
 
     @staticmethod
     def classification():
@@ -120,7 +121,16 @@ class Prediction:
 
             with col2:
                 delivery_date = st.date_input("Delivery Date", min_value=date(2020,8,1), max_value=date(2022,2,28), value=date(2020,8,1))
-                customer = st.text_input("Customer ID (Min: 12458000 & Max: 2147484000)")
+                customer_input = st.text_input("Customer ID (Min: 12458000 & Max: 2147484000)")
+                if customer_input.strip() == "":
+                    customer = 0
+                else:
+                    try:
+                        customer = float(customer_input)
+                    except ValueError:
+                        st.error("❌ Please enter a valid numeric Customer ID")
+                        st.stop()
+
                 selling_price_log = st.text_input("Selling Price (Min: 0.1 & Max: 100001000)")
                 application = st.number_input("Application", min_value=0.0, max_value=100.0, value=10.0)
                 width = st.number_input("Width", min_value=1.0, max_value=2990000.0, value=1.0)
@@ -129,30 +139,92 @@ class Prediction:
             style_submit_button()
 
             if submitted:
-                with open('C:\\Users\\viren\\OneDrive\\Desktop\\IIT-MADARAS(GUVI)\\data\\INDUSTRIAL COPPER MODELING\\pickle\\classification_model.pkl', 'rb') as f:
-                    model = pickle.load(f)
+                if quantity_log == "" or selling_price_log == "":
+                    st.warning("⚠️ Please enter values for Quantity Tons and Selling Price")
+                else:
 
-                user_data = np.array([[customer, float(country), item_type_dict[item_type], application,
-                                       width, product_ref, np.log(float(quantity_log)),
-                                       np.log(float(thickness_log)), np.log(float(selling_price_log)),
-                                       item_date.day, item_date.month, item_date.year,
-                                       delivery_date.day, delivery_date.month, delivery_date.year]])
+                    with open('C:\\Users\\viren\\OneDrive\\Desktop\\IIT-MADARAS(GUVI)\\data\\INDUSTRIAL COPPER MODELING\\pickle\\classification_model.pkl', 'rb') as f:
+                        model = pickle.load(f)
 
-                y_pred = model.predict(user_data)
-                status_result = y_pred[0]
+                    user_data = np.array([[customer, float(country), item_type_dict[item_type], application,
+                                        width, product_ref, np.log(float(quantity_log)),
+                                        np.log(float(thickness_log)), np.log(float(selling_price_log)),
+                                        item_date.day, item_date.month, item_date.year,
+                                        delivery_date.day, delivery_date.month, delivery_date.year]])
 
-                style_prediction()
-                st.markdown(f'<h3 class="center-text">Predicted Status = {status_result}</h3>', unsafe_allow_html=True)
-                st.snow()
+                    y_pred = model.predict(user_data)
+                    status_result = y_pred[0]
+
+                    style_prediction()
+                    st.markdown(f'<h3 class="center-text">Predicted Status = {status_result}</h3>', unsafe_allow_html=True)
+                    st.snow()
 
 
 # ----------------- Streamlit App -----------------
-streamlit_config()
 
-tab1, tab2 = st.tabs(['PREDICT SELLING PRICE', 'PREDICT STATUS'])
 
-with tab1:
-    Prediction.regression()
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Home", "About Project", "Prediction"])
 
-with tab2:
-    Prediction.classification()
+if page == "Home":
+     
+    img_path = r"C:\Users\viren\OneDrive\Desktop\IIT-MADARAS(GUVI)\Industrial Copper Modeling\Industrial-Copper-Modeling\background.jpg"
+    if os.path.exists(img_path):
+        with open(img_path, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            [data-testid="stAppViewContainer"] {{
+                background-image: url("data:image/jpg;base64,{encoded}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            [data-testid="stHeader"] {{
+                background: rgba(0,0,0,0);
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+            )
+        st.markdown("""
+            <div style="background-color: rgba(255, 255, 255, 0.85); 
+                        padding: 20px; 
+                        border-radius: 10px;">
+                <h2>🏠 Welcome to Industrial Copper Modeling App</h2>
+                <p>Use this application to predict the <b>Selling Price</b> or <b>Lead Status</b> for industrial copper data.</p>
+            </div>
+            """, unsafe_allow_html=True)
+elif page == "About Project":
+     st.markdown("""
+        <div style="background-color: rgba(255, 255, 255, 0.85);
+                    padding: 20px;
+                    border-radius: 10px;">
+            <p>The copper industry faces challenges with skewed and noisy sales data, 
+            making manual predictions unreliable.</p>
+            <p>This project solves the problem using <b>Machine Learning Models</b>:</p>
+            <ul>
+                <li><b>Regression</b> → Predicts continuous variable Selling Price</li>
+                <li><b>Classification</b> → Predicts lead Status (Won/Lost)</li>
+            </ul>
+            <p>The app is built with <b>Streamlit</b> to provide a simple interface for business users.</p>
+        </div>
+    """, unsafe_allow_html=True)
+elif page == "Prediction":
+    st.subheader("🤖 Make Predictions")
+    choice = st.radio("Choose Prediction Type", ["PREDICT SELLING PRICE", "PREDICT STATUS"])
+    
+    # Wrap the forms in a semi-transparent container
+    with st.container():
+        st.markdown('<div style="background-color: rgba(255,255,255,0.85); padding:20px; border-radius:10px;">', unsafe_allow_html=True)
+        
+        if choice == "PREDICT SELLING PRICE":
+            Prediction.regression()  # Your regression form
+        
+        elif choice == "PREDICT STATUS":
+            Prediction.classification()  # Your classification form
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
