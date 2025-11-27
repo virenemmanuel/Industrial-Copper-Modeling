@@ -94,16 +94,16 @@ class prediction:
 
             with col1:
 
-                item_date = st.date_input(label='Item Date', min_value=date(2020,7,1)
+                item_date = st.date_input(label='Item Date', min_value=date(2020,7,1),
                                                              max_value=date(2021,5,31), value=date(2020,7,1))
                 
                 quantity_log = st.text_input(label='Quantity Tons (Min: 0.00001 & Max: 10000000000)')
 
                 country = st.selectbox(label='Country', options=country_values)
 
-                item_type = st.selectbox(label='Item Type', options=item_type_values_)
+                item_type = st.selectbox(label='Item Type', options=item_type_values)
 
-                thickness_log = st.selectbox(label='Thickness', min_value=0.1, max_value=2500000.0, value=1.0)
+                thickness_log = st.number_input(label='Thickness', min_value=0.1, max_value=2500000.0, value=1.0)
 
                 product_ref = st.selectbox(label='Product Ref', options=product_ref_values)
 
@@ -121,10 +121,10 @@ class prediction:
 
                 width = st.number_input(label='Width', min_value=1.0, max_value=2990000.0, value=1.0)
 
-                st.write('')
-                st.write('')
-                button = st.form_submit_button(label='SUBMIT')
-                style_submit_button()
+            st.write('')
+            st.write('')
+            button = st.form_submit_button('SUBMIT')
+            style_submit_button()
 
             
             # give information to users
@@ -136,13 +136,13 @@ class prediction:
             if button:
 
                 # load the regression pickle model
-                with open(r'models\regression_model.pkl', 'rb') as f:
+                with open(r'/Users/viren_emmanuel/Desktop/Data/Pickle_files/industrial_copper_modeling/regression_model.pkl', 'rb') as f:
                     model = pickle.load(f)
 
                 # make array for all user input values in required order for model prediction
                 user_data = np.array([[customer,
                                        country,
-                                       status_dict[item_type],
+                                       status_dict[status],
                                        item_type_dict[item_type],
                                        application,
                                        width,
@@ -173,14 +173,14 @@ class prediction:
 
             with col1:
 
-                item_date = st.date_input(label='Item Date', min_value=date(2020,7,1)
+                item_date = st.date_input(label='Item Date', min_value=date(2020,7,1),
                                                             max_value=date(2021,5,31), value=date(2020,7,1))
             
                 quantity_log = st.text_input(label='Quantity Tons (Min: 0.00001 & Max: 10000000000)')
 
                 country = st.selectbox(label='Country', options=country_values)
 
-                item_type = st.selectbox(label='Item Type', options=item_type_values_)
+                item_type = st.selectbox(label='Item Type', options=item_type_values)
 
                 thickness_log = st.selectbox(label='Thickness', min_value=0.1, max_value=2500000.0, value=1.0)
 
@@ -200,10 +200,10 @@ class prediction:
 
                 width = st.number_input(label='Width', min_value=1.0, max_value=2990000.0, value=1.0)
 
-                st.write('')
-                st.write('')
-                button = st.form_submit_button(label='SUBMIT')
-                style_submit_button()
+            st.write('')
+            st.write('')
+            button = st.form_submit_button('SUBMIT')
+            style_submit_button()
             
             # give information to users
             col1, col2 = st.columns([0.65,0.35])
@@ -214,7 +214,7 @@ class prediction:
             if button:
 
                 # load the classification pickle model
-                with open(r'models\classification_model.pkl','rb') as f:
+                with open(r'/Users/viren_emmanuel/Desktop/Data/Pickle_files/industrial_copper_modeling/classification_model.pkl','rb') as f:
                     model = pickle.load(f)
 
                 # make array for all user input values in required order for model prediction
